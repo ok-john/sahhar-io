@@ -1,6 +1,7 @@
 *.gz
 sahhar-io
 public/
+*.checksum
 *.zst
 sys.casa
 *.tar.*

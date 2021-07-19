@@ -88,7 +88,7 @@ func inEnv(relativePath string) string {
 }
 
 func launch(ctx context.Context) error {
-
+	defer ctx.Done()
 	// fiber
 	app := fiber.New()
 
@@ -99,10 +99,15 @@ func launch(ctx context.Context) error {
 	app.Use("/",
 		logRequests,
 		addHeaders,
-		newLimiter,
 		faviconHandler(),
 		etag.New(),
 		requestid.New(),
+		limiter.New(limiter.Config{
+                	Next:         limiterMiddleware,
+                	Max:          20,
+                	Expiration:   30 * time.Second,
+                	LimitReached: limiterHandler,
+        	}),
 	)
 
 	// Serve TLS
@@ -116,15 +121,6 @@ func launch(ctx context.Context) error {
 func faviconHandler() fiber.Handler {
 	return favicon.New(favicon.Config{
 		File: inEnv("static/img/favicon.ico"),
-	})
-}
-
-func newLimiter() fiber.Handler {
-	return limiter.New(limiter.Config{
-		Next:         limiterMiddleware,
-		Max:          20,
-		Expiration:   30 * time.Second,
-		LimitReached: limiterHandler,
 	})
 }
 
