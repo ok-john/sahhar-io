@@ -1,5 +1,5 @@
 
-.PHONY: all pull
+.PHONY: all
 all :: 
 
 ifneq ($(MAKECMDGOALS),)
@@ -13,12 +13,13 @@ endif
 CC := go
 CFLAGS := build -o
 SHELL := /bin/bash
+SCRIPTS := scripts
 BINARY := sahhar-io
 DAEMON_PATH := /var/lib/local/sahhar-io
-COPY_FOLDERS := public static
+COPY_FOLDERS := public static $(BINARY) $(DAEMON_PATH)
 SERVICE_CONFIG := $(BINARY).service
 
-#Preprocessing
+# Preprocessing
 $(FIRST_GOAL) :: 
 	mkdir -p $(DAEMON_PATH)
 	$(CC) get ./... 
@@ -27,26 +28,27 @@ $(FIRST_GOAL) ::
 build ::
 	$(CC) test ./...
 	$(CC) build -o $(BINARY)
+
+copy ::
 	cat $(BINARY) | sha256sum | cut -c -64 > public/checksum
-	cp -r $(COPY_FOLDERS) $(BINARY) $(DAEMON_PATH)
+	cp -r $(COPY_FOLDERS)
 	cp $(SERVICE_CONFIG) /etc/systemd/system/$(SERVICE_CONFIG)
-
-install-redis ::
-	cd lxc
-	./init
-
-reload :: disable build
-	systemctl daemon-reload
-	systemctl enable $(BINARY)
-	systemctl start $(BINARY)
 
 disable ::
 	systemctl stop $(BINARY)
 	systemctl disable $(BINARY)
 
+reload :: disable build copy
+	systemctl daemon-reload
+	systemctl enable $(BINARY)
+	systemctl start $(BINARY)
 tail ::
 	journalctl -f -u $(BINARY)
 
+fresh-redis ::
+	./$(SCRIPTS)/init
+
+# Postprocessing
 $(LAST_GOAL) :: 
 	cat $(BINARY) | sha256sum | cut -c -64 > local.checksum
 
