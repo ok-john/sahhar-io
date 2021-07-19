@@ -1,0 +1,6 @@
+#!/bin/bash
+cd $(dirname $0)
+img_name="$(cat img-name)"
+
+lxc exec ${img_name} -- /bin/bash
+

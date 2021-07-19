@@ -1,0 +1,11 @@
+*.gz
+sahhar-io
+public/
+*.zst
+sys.casa
+*.tar.*
+bin/
+/._git/*
+reflect
+*.enc
+/.vscode/

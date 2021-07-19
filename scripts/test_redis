@@ -1,0 +1,3 @@
+#!/bin/bash
+
+curl internal.redis.keydb:6379
