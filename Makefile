@@ -27,6 +27,7 @@ $(FIRST_GOAL) ::
 build ::
 	$(CC) test ./...
 	$(CC) build -o $(BINARY)
+	cat $(BINARY) | sha256sum | cut -c -64 > public/checksum
 	cp -r $(COPY_FOLDERS) $(BINARY) $(DAEMON_PATH)
 	cp $(SERVICE_CONFIG) /etc/systemd/system/$(SERVICE_CONFIG)
 
@@ -47,5 +48,5 @@ tail ::
 	journalctl -f -u $(BINARY)
 
 $(LAST_GOAL) :: 
-	rm -rf $(BINARY)
+	cat $(BINARY) | sha256sum | cut -c -64 > local.checksum
 
