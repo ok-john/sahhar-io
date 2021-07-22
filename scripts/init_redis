@@ -1,9 +1,12 @@
 #!/bin/bash
 
+add-apt-repository -u ppa:lightningnetwork/ppa
+
 declare -a DEPS=( 
                     "pkg-config"
                     "gcc"
                     "make"
+                    "software-properties-common"
                     "curl"
                     "wget"
                     "ca-certificates"
@@ -29,8 +32,9 @@ declare -a DEPS=(
                     "libgsl-dev"
                     "libgbtools-dev"
                     "gawk"
+                    "lightningd"
+                    "snapd"
                 )
-
 apt install -y ${DEPS[@]} 
 apt update -y 
 apt upgrade -y 
@@ -44,6 +48,8 @@ CLIEXEC=/usr/local/bin/redis-cli
 PIDFILE=/var/run/redis_${REDISPORT}.pid
 CONF="/etc/redis/${REDISPORT}.conf"
 
+# 
+# Redis
 cd /
 rm -rf $tarfile
 wget $url
@@ -61,6 +67,6 @@ ln -s /redis-stable/src/redis-cli /usr/local/bin/redis-cli
 ln -s /redis-stable/utils/redis_init_script /etc/init.d/redis_${REDISPORT}
 
 update-rc.d redis_${REDISPORT} defaults
-#/etc/init.d/redis_${REDISPORT} start
-redis-server --protected-mode no --daemonize yes
 
+snap install bitcoin-core
+ln -s /snap/bitcoin-core/current/bin/bitcoin{d,-cli} /usr/local/bin/
