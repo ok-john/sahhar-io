@@ -16,6 +16,7 @@ declare -a DEPS=(
                     "libsodium-dev"
                     "build-essential"
                     "make"
+                    "libpq-dev"
                     "software-properties-common"
                     "curl"
                     "postgresql"
