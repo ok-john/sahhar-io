@@ -7,5 +7,5 @@ lxc launch images:debian/buster $img_name
 lxc config set $img_name security.nesting true
 lxc restart $img_name
 lxc file push ./init_redis $img_name/
-lxc exec $img_name -- /init_redis
+lxc exec $img_name -- /init-redis
 
