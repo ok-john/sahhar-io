@@ -2,6 +2,5 @@
 
 cd $(dirname $0)
 img_name="$(cat img-name)"
-
 lxc stop ${img_name} && lxc delete ${img_name}
 
