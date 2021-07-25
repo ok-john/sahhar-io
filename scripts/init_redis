@@ -1,6 +1,4 @@
 #!/bin/bash
-#!/bin/bash
-add-apt-repository -u ppa:lightningnetwork/ppa
 
 declare -a DEPS=( 
                     "pkg-config"
@@ -19,7 +17,6 @@ declare -a DEPS=(
                     "libpq-dev"
                     "software-properties-common"
                     "curl"
-                    "postgresql"
                     "wget"
                     "ca-certificates"
                     "openssl"
@@ -43,7 +40,6 @@ declare -a DEPS=(
                     "libgsl-dev"
                     "libgbtools-dev"
                     "gawk"
-                    "lightningd"
                     "snapd"
                 )
 
@@ -52,46 +48,27 @@ apt update -y
 apt upgrade -y 
 apt autoremove -y
 
-snap install bitcoin-core
-ln -s /snap/bitcoin-core/current/bin/bitcoin{d,-cli} /usr/local/bin/
-
-
-git clone https://github.com/ElementsProject/lightning.git
-cd lightning
-sudo apt-get install -y valgrind python3-pip libpq-dev
-pip3 install -r requirements.txt
-
-./configure
-make
-make install
 
 tarfile="redis-stable.tar.gz"
 url="http://download.redis.io/redis-stable.tar.gz"
-REDISPORT=6379
+REDISPORT=${1:-6379}
 EXEC=/usr/local/bin/redis-server
 CLIEXEC=/usr/local/bin/redis-cli
 PIDFILE=/var/run/redis_${REDISPORT}.pid
 CONF="/etc/redis/${REDISPORT}.conf"
 
-# 
-# Redis
 cd /
 rm -rf $tarfile
 wget $url
 tar -xzf $tarfile
-cp /redis-stable/redis.conf /etc/redis/${REDISPORT}.conf
-mkdir -p /var/redis
-mkdir -p /etc/redis
-mkdir -p /var/redis/${REDISPORT}
+mkdir -p /var/redis && mkdir -p /etc/redis && mkdir -p /var/redis/${REDISPORT}
 
 cd /redis-stable
 make distclean
 make test
 ln -s /redis-stable/src/redis-server /usr/local/bin/redis-server
 ln -s /redis-stable/src/redis-cli /usr/local/bin/redis-cli
+ln -s /redis-stable/redis.conf /etc/redis/${REDISPORT}.conf
 ln -s /redis-stable/utils/redis_init_script /etc/init.d/redis_${REDISPORT}
 
 update-rc.d redis_${REDISPORT} defaults
-
-
-
